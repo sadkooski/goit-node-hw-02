@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Contacts</title>
+  </head>
+  <body>
+    <h1>Contact List</h1>
+    <ul>
+      <% contacts.forEach(contact => { %>
+      <li><%= contact.name %> - <%= contact.email %> - <%= contact.phone %></li>
+      <% }); %>
+    </ul>
+
+    <form action="/api/contacts" method="POST">
+      <label for="name">Name</label>
+      <input type="text" name="name" id="name" />
+      <label for="email">Email</label>
+      <input type="text" name="email" id="email" />
+      <label for="phone">Phone</label>
+      <input type="text" name="phone" id="phone" />
+      <button type="submit">Add contact</button>
+    </form>
+  </body>
+</html>
