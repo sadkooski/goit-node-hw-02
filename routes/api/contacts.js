@@ -4,6 +4,9 @@ const contacts = require("../../models/contacts");
 const nanoid = require("nanoid");
 const Joi = require("joi");
 
+const indexContacts = require('../../controllers/contacts/indexContacts');
+
+
 const contactSchema = Joi.object({
   name: Joi.string()
     .regex(/^[a-zA-Z]+$/)
@@ -22,14 +25,7 @@ const contactSchema = Joi.object({
   }),
 });
 
-router.get("/", async (req, res, next) => {
-  try {
-    const allContacts = await contacts.listContacts();
-    res.json({ contacts: allContacts });
-  } catch (err) {
-    next(err);
-  }
-});
+router.get("/", indexContacts);
 
 router.get("/:contactId", async (req, res, next) => {
   try {
@@ -37,10 +33,10 @@ router.get("/:contactId", async (req, res, next) => {
     const contactById = await contacts.getContactById(contactId);
 
     if (!contactById) {
-      res.status(404).json({ message: "Not found" });
+     return res.status(404).json({ message: "Not found" });
     }
 
-    res.json({ contact: contactById });
+   return res.json({ contact: contactById });
   } catch (err) {
     next(err);
   }
@@ -61,7 +57,7 @@ router.post("/", async (req, res, next) => {
 
     const id = nanoid();
     await contacts.addContact({ id, name, email, phone });
-    res.status(201).json({ id, name, email, phone });
+    return res.status(201).json({ id, name, email, phone });
   } catch (err) {
     next(err);
   }
@@ -76,7 +72,7 @@ router.delete("/:contactId", async (req, res, next) => {
       return res.status(200).json({ message: "Contact deleted" });
     }
 
-    res.status(404).json({ message: "Not found" });
+   return res.status(404).json({ message: "Not found" });
   } catch (err) {
     next(err);
   }
