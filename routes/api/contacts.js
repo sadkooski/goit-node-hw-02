@@ -5,6 +5,7 @@ const nanoid = require("nanoid");
 const Joi = require("joi");
 
 const indexContacts = require('../../controllers/contacts/indexContacts');
+const showContact = require('../../controllers/contacts/showContact');
 
 
 const contactSchema = Joi.object({
