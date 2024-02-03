@@ -1,4 +1,6 @@
 const {  listContacts } = require('../../models/contacts')
+const { Contact } = require('../../service/schemas/contacts')
+
 async function indexContacts(req, res, next){
     try {
         const contacts = await listContacts();

@@ -1,6 +1,8 @@
 const { addContact } = require('../../models/contacts')
 const nanoid = require("nanoid");
 const Joi = require("joi");
+const Contact = require('../../service/schemas/contacts')
+const service = require('../../service')
 
 const contactSchema = Joi.object({
     name: Joi.string()
@@ -32,12 +34,25 @@ async function createContacts(req, res, next){
         if (error) {
           return res.status(400).json({ message: error.details[0].message });
         }
-    
         const id = nanoid();
-        await addContact({ id, name, email, phone });
-        return res.status(201).json({ id, name, email, phone });
+        
+        // const contact = new Contact({
+        //   name: name,
+        //   email: email,
+        //   phone: phone,
+        // })
+     
+        // const savedContact = await contact.save();
+        const result = await service.createContact( {name, email, phone })
+
+        console.log('Contact created', result);
+        return res.json({data: result})
+       
       } catch (err) {
         next(err);
       }
 }
-module.exports = createContacts;
+module.exports = createContacts; 
+// await addContact({ id, name, email, phone });
+        // return res.status(201).json({ id, name, email, phone });
+
