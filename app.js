@@ -16,8 +16,9 @@ const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 const connection = mongoose.connect(process.env.DATABASE_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-}).then(() => console.log("Connected to MongoDB"))
-.catch((err) => console.error("Error connecting to MongoDB:", err));;
+}).then(() => console.log("Database connection successful"))
+.catch((err) => {console.error("Error connecting to MongoDB:", err)
+  process.exit(1)});;
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
