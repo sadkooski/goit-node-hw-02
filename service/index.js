@@ -20,8 +20,8 @@ function updateContact(id, body){
     return Contact.findByIdAndUpdate({_id: id}, body, {new: true})
 }
 
-function updateStatusContact(id, body){
-    return Contact.findByIdAndUpdate({_id: id}, body, {new: true})
+function updateContactStatus(id, favorite){
+    return Contact.findByIdAndUpdate({_id: id}, favorite, {new: true})
 }
 
 module.exports = {
@@ -30,6 +30,5 @@ module.exports = {
     getAllContacts,
     getContactById,
     updateContact,
-    updateStatusContact,
+    updateContactStatus,
   }
-  

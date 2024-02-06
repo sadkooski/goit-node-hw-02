@@ -21,4 +21,10 @@ const contactSchema = Joi.object({
     }),
   });
 
-  module.exports = contactSchema;
+  const favoriteSchema = Joi.object({
+    favorite: Joi.boolean().required().messages({
+      "any.required": "favorite is requires",
+    }),
+  })
+
+  module.exports = {contactSchema, favoriteSchema};

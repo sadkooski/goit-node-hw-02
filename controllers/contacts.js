@@ -1,7 +1,7 @@
-const contactSchema = require('../service/validation')
-const { createContact, deleteContact, getAllContacts, getContactById, updateContact, updateStatusContact } = require('../service/index')
+const {contactSchema, favoriteSchema} = require('../service/validation')
+const { createContact, deleteContact, getAllContacts, getContactById, updateContact, updateContactStatus } = require('../service/index')
 
-async function indexContacts(req, res, next){
+async function get(req, res, next){
     try {
       const result = await getAllContacts();
       if (result) {
@@ -12,12 +12,12 @@ async function indexContacts(req, res, next){
       }
     }
 
-    async function showContact(req, res, next){
+    async function getById(req, res, next){
         try {
             const contactId = req.params.contactId;
             const result = await getContactById(contactId);
             if (!result) {
-             return res.status(404).json({ message: "Not found" });
+             return res.status(404).json({ message: "Contact not found" });
             }
             return res.json({ contact: result });
           } catch (err) {
@@ -25,7 +25,7 @@ async function indexContacts(req, res, next){
           }
     }    
 
-    async function createContacts(req, res, next){
+    async function create(req, res, next){
         try {
             const { name, email, phone, favorite } = req.body;
         
@@ -47,7 +47,7 @@ async function indexContacts(req, res, next){
           }
     }
 
-    async function deleteContacts(req, res, next){
+    async function remove(req, res, next){
         try {
             const contactId = req.params.contactId;
             const result = await deleteContact(contactId);
@@ -62,7 +62,7 @@ async function indexContacts(req, res, next){
           }
     }
 
-    async function updateContacts(req, res, next){
+    async function update(req, res, next){
         try {
             const contactId = req.params.contactId;
             const { name, email, phone, favorite } = req.body;
@@ -88,22 +88,21 @@ async function indexContacts(req, res, next){
           }
     }
 
-    async function updateStatusContacts(req, res, next){
+    async function updateStatus(req, res, next){
         try {
             const contactId = req.params.contactId;
-            const { name, email, phone, favorite } = req.body;
-            const { error } = contactSchema.validate(req.body);
+            const favorite  = req.body;
+            const { error } = favoriteSchema.validate(favorite);
     
             if (error) {
                 return res.status(400).json({ message: error.details[0].message });
               }
               
-              const body = { name, email, phone, favorite };
-              if (!body) {
+              if (!favorite) {
                 return res.status(400).json({ message: "Missing field favorite" });
               }
     
-              const result = await updateStatusContact(contactId, body);
+              const result = await updateContactStatus(contactId, favorite);
               if (result) {
                 return res.status(200).json(result);
               } else {
@@ -114,10 +113,11 @@ async function indexContacts(req, res, next){
           }
      }
 
-     module.exports = 
-     indexContacts,
-     showContact,
-     createContacts,
-     deleteContacts,
-     updateContacts,
-     updateStatusContacts;
+     module.exports = {    
+      get,
+      getById,
+      create,
+      remove,
+      update,
+      updateStatus,
+    }
