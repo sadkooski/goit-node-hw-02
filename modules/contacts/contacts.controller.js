@@ -1,5 +1,5 @@
-const {contactSchema, favoriteSchema} = require('../service/validation')
-const { createContact, deleteContact, getAllContacts, getContactById, updateContact, updateContactStatus } = require('../service/index')
+const {contactSchema, favoriteSchema} = require('./contacts.validation')
+const { createContact, deleteContact, getAllContacts, getContactById, updateContact, updateContactStatus } = require('./contacts.service')
 
 async function get(req, res, next){
     try {
@@ -39,9 +39,9 @@ async function get(req, res, next){
             }
             const result = await createContact( { name, email, phone, favorite })
             result.save();
+            
             console.log('Contact created', result);
             return res.json({data: result})
-           
           } catch (err) {
             next(err);
           }
