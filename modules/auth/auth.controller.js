@@ -1,5 +1,9 @@
 const jwt = require('jsonwebtoken')
 const  User  = require('../users/user.schema')
+const gravatar = require('gravatar')
+const Jimp = require('jimp')
+const path = require('path');
+const fs = require('fs');
 
 async function register(req, res, next) {
 try {
@@ -9,10 +13,13 @@ try {
         return res.status(400).json({ message: "missing required field" });
       }
 
+    const avatarURL = gravatar.url(email)
+
     const user = new User({
         password: req.body.password,
         email: email,
         subscription: subscription,
+        avatarURL: avatarURL
      })
 
     if (!user.checkIfUserExists(email)) {
@@ -21,7 +28,7 @@ try {
      user.setPassword(req.body.password)
 
      await user.save()
-     return res.status(201).json({ user: email, subscription })} 
+     return res.status(201).json({ user: email, subscription: subscription, avatarURL: avatarURL })} 
      catch (err) {
     console.log(err)
        next(err)
@@ -66,7 +73,6 @@ async function logOut(req, res, next) {
     } catch (err) {
         console.log(err)
         res.status(500).json({ error: 'Wystąpił błąd podczas wylogowywania użytkownika.' })
-        next(err)
     }
 }
 
@@ -82,8 +88,35 @@ async function getUserData(req, res ,next) {
             subscription: user.subscription
         });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: 'Wystąpił błąd podczas pobierania danych użytkownika.' });
-        next(err)
+    }
+}
+
+async function updateAvatar(req, res, next) {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(401).json({ message: 'Not authorized' });
+        }
+
+        const image = await Jimp.read(req.file.path);
+        await image.resize(250, 250).writeAsync(req.file.path);
+
+        const uniqueFileName = `${req.user.userId}-${Date.now()}${path.extname(req.file.originalname)}`;
+
+        fs.renameSync(req.file.path, `public/avatars/${uniqueFileName}`);
+
+        req.user.avatarURL = `/avatars/${uniqueFileName}`;
+
+        user.avatarURL = req.user.avatarURL;
+        await user.save();
+
+        res.status(200).json({ avatarURL: req.user.avatarURL });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
@@ -91,5 +124,6 @@ module.exports = {
     login, 
     register,
     logOut,
-    getUserData
+    getUserData,
+    updateAvatar,
 }
