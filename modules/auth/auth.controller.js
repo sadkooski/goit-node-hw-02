@@ -146,17 +146,55 @@ async function updateAvatar(req, res, next) {
 async function verify(req, res) {
     try {
         const verificationToken  = req.params.verificationToken;
-        const user = await User.findOne({verificationToken});
+        console.log('teoken', verificationToken)
+        const user = await User.findOne({verificationToken: verificationToken});
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        user.verificationToken = null;
+        user.verificationToken = 0;
         user.verify = true;
         await user.save();
 
         return res.status(200).json({ message: 'Verification successful' });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+async function resend(req, res) {
+    try {
+        const { email } = req.body
+        if (!email) {
+            return res.status(400).json({ message: "Missing required field email" });
+        }
+
+        const user = await User.findOne({email: email});
+        if (user.verify === true) {
+            return res.status(400).json({ message: "Verification has already been passed" });
+        }
+
+            const verifyLink = `${req.protocol}://${req.get('host')}/auth/users/verify/${user.verificationToken}`;
+            const msg = {
+               to: 'mrproskar@gmail.com',
+               from: 'mrproskar@gmail.com',
+               subject: 'Sending with SendGrid is Fun',
+               text: `Click the link below to verify your email:\n${verifyLink}`,
+               html: `<p>Click the link below to verify your email:</p><p><a href="${verifyLink}">${verifyLink}</a></p>`
+             };
+             await sgMail
+             .send(msg)
+             .then(() => {
+               console.log('Email sent');
+             })
+             .catch(error => {
+               console.error(error);
+             });
+
+        return res.status(200).json({ message: "Verification email sent" })
+
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message: 'Internal server error' });
@@ -170,4 +208,5 @@ module.exports = {
     getUserData,
     updateAvatar,
     verify,
+    resend,
 }
