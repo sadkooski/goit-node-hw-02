@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { login, register, logOut, getUserData, updateAvatar } = require('./auth.controller')
+const { login, register, logOut, getUserData, updateAvatar, verify } = require('./auth.controller')
 const {auth} = require('../auth/auth.middleware')
 const multer = require('multer')
 
@@ -19,5 +19,6 @@ router.post('/users/signup', register)
 router.post('users/logout', auth, logOut)
 router.get('/users/current', auth, getUserData)
 router.patch('/users/avatars', auth, upload.single('avatar'), updateAvatar)
+router.get('/users/verify/:verificationToken', verify)
 
 module.exports = router

@@ -6,8 +6,9 @@ const auth = (req, res, next) => {
     passport.authenticate(strategy, (err, user) => {
         console.log('Middleware')
         if (err || !user) {
+            console.log(user)
             return res.status(401).json({
-                message: "Not authorized"
+                message: "Not authorized" 
             })
         }   
         req.user = user

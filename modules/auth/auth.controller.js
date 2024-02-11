@@ -4,6 +4,9 @@ const gravatar = require('gravatar')
 const Jimp = require('jimp')
 const path = require('path');
 const fs = require('fs');
+const nanoid = require('nanoid');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 async function register(req, res, next) {
 try {
@@ -12,23 +15,43 @@ try {
     if ( !email || !password ) {
         return res.status(400).json({ message: "missing required field" });
       }
-
     const avatarURL = gravatar.url(email)
-
+    const verificationToken = nanoid();
     const user = new User({
         password: req.body.password,
         email: email,
         subscription: subscription,
-        avatarURL: avatarURL
+        avatarURL: avatarURL,
+        verificationToken: verificationToken,
+        verify: false
      })
 
     if (!user.checkIfUserExists(email)) {
        return res.status(409).json({ message: "Email in use" })
     }
-     user.setPassword(req.body.password)
 
+     user.setPassword(req.body.password)
+    
+     const verifyLink = `${req.protocol}://${req.get('host')}/auth/users/verify/${verificationToken}`;
+     const msg = {
+        to: 'mrproskar@gmail.com',
+        from: 'mrproskar@gmail.com',
+        subject: 'Sending with SendGrid is Fun',
+        text: `Click the link below to verify your email:\n${verifyLink}`,
+        html: `<p>Click the link below to verify your email:</p><p><a href="${verifyLink}">${verifyLink}</a></p>`
+      };
+      await sgMail
+      .send(msg)
+      .then(() => {
+        console.log('Email sent');
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    
      await user.save()
-     return res.status(201).json({ user: email, subscription: subscription, avatarURL: avatarURL })} 
+     return res.status(201).json({ user: email, subscription: subscription, avatarURL: avatarURL })}
+
      catch (err) {
     console.log(err)
        next(err)
@@ -120,10 +143,31 @@ async function updateAvatar(req, res, next) {
     }
 }
 
+async function verify(req, res) {
+    try {
+        const verificationToken  = req.params.verificationToken;
+        const user = await User.findOne({verificationToken});
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.verificationToken = null;
+        user.verify = true;
+        await user.save();
+
+        return res.status(200).json({ message: 'Verification successful' });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
 module.exports = {
     login, 
     register,
     logOut,
     getUserData,
     updateAvatar,
+    verify,
 }
