@@ -1,14 +1,15 @@
-const jwt = require('jsonwebtoken')
-const  User  = require('../users/user.schema')
-const gravatar = require('gravatar')
-const Jimp = require('jimp')
-const path = require('path');
-const fs = require('fs');
-const nanoid = require('nanoid');
-const sgMail = require('@sendgrid/mail');
+import jwt from 'jsonwebtoken';
+import User from '../users/user.schema.mjs';
+import gravatar from 'gravatar';
+import Jimp from 'jimp';
+import path from 'path';
+import fs from 'fs';
+import nanoid from 'nanoid';
+import sgMail from '@sendgrid/mail';
+
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-async function register(req, res, next) {
+export async function register(req, res, next) {
 try {
     const {email, password, subscription} = req.body
     
@@ -32,7 +33,7 @@ try {
 
      user.setPassword(req.body.password)
     
-     const verifyLink = `${req.protocol}://${req.get('host')}/auth/users/verify/${verificationToken}`;
+  const verifyLink = `${req.protocol}://${req.get('host')}/auth/users/verify/${verificationToken}`;
      const msg = {
         to: 'mrproskar@gmail.com',
         from: 'mrproskar@gmail.com',
@@ -58,7 +59,7 @@ try {
      }
     } 
 
-    async function login(req, res) {
+export async function login(req, res) {
         const {email, password} = req.body
         const user = await User.findOne({ email })
         
@@ -83,7 +84,7 @@ try {
         })
         }
         
-async function logOut(req, res, next) {
+export async function logOut(req, res, next) {
     try {
    const user = await User.findById(req.user._id);
 
@@ -99,7 +100,7 @@ async function logOut(req, res, next) {
     }
 }
 
-async function getUserData(req, res ,next) {
+export async function getUserData(req, res ,next) {
     try {
         const user = await User.findById(req.user._id);
 
@@ -116,7 +117,7 @@ async function getUserData(req, res ,next) {
     }
 }
 
-async function updateAvatar(req, res, next) {
+export async function updateAvatar(req, res, next) {
     try {
         const user = await User.findById(req.user._id);
         if (!user) {
@@ -143,7 +144,7 @@ async function updateAvatar(req, res, next) {
     }
 }
 
-async function verify(req, res) {
+export async function verify(req, res) {
     try {
         const verificationToken  = req.params.verificationToken;
         console.log('teoken', verificationToken)
@@ -164,7 +165,7 @@ async function verify(req, res) {
     }
 }
 
-async function resend(req, res) {
+export async function resend(req, res) {
     try {
         const { email } = req.body
         if (!email) {
@@ -201,12 +202,3 @@ async function resend(req, res) {
     }
 }
 
-module.exports = {
-    login, 
-    register,
-    logOut,
-    getUserData,
-    updateAvatar,
-    verify,
-    resend,
-}

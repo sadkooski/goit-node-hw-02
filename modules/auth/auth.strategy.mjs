@@ -1,9 +1,7 @@
-const passport = require('passport')
-const passportJwt = require('passport-jwt')
-const User = require('../users/user.schema')
-
-
-  const strategy = new passportJwt.Strategy(
+import passport from 'passport';
+import passportJwt from 'passport-jwt';
+import User from '../users/user.schema.mjs';
+const strategy = new passportJwt.Strategy(
         {
 secretOrKey: process.env.JWT_SECRET,
 jwtFromRequest: passportJwt.ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -25,6 +23,4 @@ jwtFromRequest: passportJwt.ExtractJwt.fromAuthHeaderAsBearerToken(),
 
 passport.use(strategy)
 
-module.exports = {
-    strategy,
-}
+export { strategy };

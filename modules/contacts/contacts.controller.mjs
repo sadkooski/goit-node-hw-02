@@ -1,5 +1,6 @@
-const {contactSchema, favoriteSchema} = require('./contacts.validation')
-const { createContact, deleteContact, getAllContacts, getContactById, updateContact, updateContactStatus } = require('./contacts.service')
+import { getAllContacts, getContactById, createContact, deleteContact, updateContact, updateContactStatus } from './contacts.service.mjs';
+import { contactSchema, favoriteSchema } from './contacts.validation.mjs';
+
 
 async function get(req, res, next){
     try {
@@ -113,11 +114,4 @@ async function get(req, res, next){
           }
      }
 
-     module.exports = {    
-      get,
-      getById,
-      create,
-      remove,
-      update,
-      updateStatus,
-    }
+     export { get, getById, create, remove, update, updateStatus };

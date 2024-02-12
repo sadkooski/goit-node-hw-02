@@ -1,8 +1,9 @@
-const express = require("express");
+import express from 'express';
+import { login, register, logOut, getUserData, updateAvatar, verify, resend } from './auth.controller.mjs';
+import auth from './auth.middleware.mjs';
+import multer from 'multer';
+
 const router = express.Router();
-const { login, register, logOut, getUserData, updateAvatar, verify, resend } = require('./auth.controller')
-const {auth} = require('../auth/auth.middleware')
-const multer = require('multer')
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -22,4 +23,4 @@ router.patch('/users/avatars', auth, upload.single('avatar'), updateAvatar)
 router.get('/users/verify/:verificationToken', verify)
 router.post('/users/verify', resend)
 
-module.exports = router
+export default router;

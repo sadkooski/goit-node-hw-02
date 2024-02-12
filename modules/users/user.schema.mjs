@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
-const bcrypt = require('bcrypt');
-const  Schema  = mongoose.Schema;
+import mongoose from "mongoose";
+import bcrypt from 'bcrypt';
+const { Schema } = mongoose;
 
 const users = new Schema({
         password: {
@@ -50,4 +50,4 @@ users.methods.checkIfUserExists = async function (email) {
 
 const User = mongoose.model("user", users);
 
-module.exports = User;
+export default User;

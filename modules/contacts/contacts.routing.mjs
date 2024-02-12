@@ -1,6 +1,6 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const ctrlContact = require('./contacts.controller')
+import * as ctrlContact from './contacts.controller.mjs';
 
 router.get("/", ctrlContact.get);
 router.get("/:contactId", ctrlContact.getById);
@@ -9,4 +9,4 @@ router.delete("/:contactId", ctrlContact.remove);
 router.put("/:contactId", ctrlContact.update);
 router.patch("/:contactId/favorite", ctrlContact.updateStatus)
 
-module.exports =  router;
+export default router;

@@ -1,6 +1,6 @@
-const passport = require('passport')
-const express = require("express");
-const {strategy} = require('./auth.strategy')
+import passport from 'passport';
+import express from 'express';
+import { strategy } from './auth.strategy.mjs';
 
 const auth = (req, res, next) => {
     passport.authenticate(strategy, (err, user) => {
@@ -16,6 +16,4 @@ const auth = (req, res, next) => {
     })(req, res, next)
 }
 
-module.exports = {
-    auth,
-}
+export default auth;
